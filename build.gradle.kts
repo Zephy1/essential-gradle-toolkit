@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "gg.essential"
-version = "0.6.10"
+version = "0.6.11"
 
 java.withSourcesJar()
 
@@ -16,6 +16,7 @@ repositories {
     maven(url = "https://jitpack.io")
     maven(url = "https://maven.architectury.dev/")
     maven(url = "https://repo.essential.gg/repository/maven-public")
+	maven(url = "https://repo.legacyfabric.net/repository/legacyfabric/")
 }
 
 dependencies {

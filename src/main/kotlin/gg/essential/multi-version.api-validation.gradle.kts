@@ -2,7 +2,6 @@ package gg.essential
 
 import gg.essential.gradle.multiversion.apivalidation.ExtractApiFile
 import gg.essential.gradle.multiversion.apivalidation.MergeApiFiles
-import gg.essential.gradle.util.isMultiversionChildProject
 import gg.essential.gradle.util.multiversionChildProjects
 
 plugins {

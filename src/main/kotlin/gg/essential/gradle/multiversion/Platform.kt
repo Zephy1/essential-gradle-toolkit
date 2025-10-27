@@ -15,6 +15,7 @@ data class Platform(
     val loaderStr = loader.toString().lowercase()
 
     val isFabric = loader == Loader.Fabric
+	val isLegacyFabric = loader == Loader.LegacyFabric
     val isForge = loader == Loader.Forge
     val isNeoForge = loader == Loader.NeoForge
     val isForgeLike = isForge || isNeoForge
@@ -34,6 +35,7 @@ data class Platform(
 
     enum class Loader {
         Fabric,
+		LegacyFabric,
         Forge,
         NeoForge,
     }
@@ -68,18 +70,20 @@ data class Platform(
             val loomPlatform = project.findProperty("loom.platform")?.toString()
             when (loomPlatform?.lowercase()) {
                 "fabric" -> return Loader.Fabric
+				"legacyfabric" -> return Loader.LegacyFabric
                 "forge" -> return Loader.Forge
                 "neoforge" -> return Loader.NeoForge
-                null -> {}
+                null -> { }
                 else -> throw GradleException("Unknown loom.platform value: \"$loomPlatform\"")
             }
 
             // If that's not set, try to infer it from the project name
             when {
                 "fabric" in project.name.lowercase() -> return Loader.Fabric
+				"legacyfabric" in project.name.lowercase() -> return Loader.LegacyFabric
                 "neoforge" in project.name.lowercase() -> return Loader.NeoForge
                 "forge" in project.name.lowercase() -> return Loader.Forge
-                else -> {}
+                else -> { }
             }
 
             throw GradleException("Failed to infer mod loader for project \"${project.path}\".\n" +
