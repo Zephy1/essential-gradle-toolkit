@@ -6,4 +6,4 @@ plugins {
     id("com.replaymod.preprocess-root")
 }
 
-checkJavaVersion(JavaVersion.VERSION_16)
+checkJavaVersion(JavaVersion.VERSION_21)
