@@ -40,6 +40,7 @@ val revisions = mutableListOf<Revision>()
 // one until they opt-in to the new one.
 revisions.add(Revision(
     yarn = mapOf(
+        12111 to "25w44a+build.11:v2",
         12110 to "1.21.10+build.2:v2",
         12109 to "1.21.9+build.1:v2",
         12108 to "1.21.8+build.1:v2",
