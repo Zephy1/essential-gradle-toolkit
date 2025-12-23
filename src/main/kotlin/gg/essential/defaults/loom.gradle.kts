@@ -40,8 +40,8 @@ val revisions = mutableListOf<Revision>()
 // one until they opt-in to the new one.
 revisions.add(Revision(
     yarn = mapOf(
-        12111 to "1.21.11+build.1:v2",
-        12110 to "1.21.10+build.2:v2",
+        12111 to "1.21.11+build.3:v2",
+        12110 to "1.21.10+build.3:v2",
         12109 to "1.21.9+build.1:v2",
         12108 to "1.21.8+build.1:v2",
         12107 to "1.21.7+build.8:v2",
@@ -106,7 +106,7 @@ revisions.add(Revision(
         10800 to "stable:18-1.8",
         10710 to "stable:12-1.7.10",
     ),
-    fabricLoader = "0.18.2",
+    fabricLoader = "0.18.3",
     legacyFabricLoader = "1.13.2",
     forge = mapOf(
         12108 to "1.21.8-58.0.0",
