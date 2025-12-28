@@ -106,7 +106,7 @@ revisions.add(Revision(
         10800 to "stable:18-1.8",
         10710 to "stable:12-1.7.10",
     ),
-    fabricLoader = "0.18.3",
+    fabricLoader = "0.18.4",
     legacyFabricLoader = "1.13.2",
     forge = mapOf(
         12108 to "1.21.8-58.0.0",
