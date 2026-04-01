@@ -34,16 +34,12 @@ fun setupLoomPlugin() {
     if (platform.isUnobfuscated) {
         extra.set("fabric.loom.disableObfuscation", "true")
         apply<LoomNoRemapGradlePlugin>()
-    } else {
-        apply<LoomGradlePlugin>()
-    }
-
-    if (platform.loaderStr.lowercase() == "legacyfabric") {
+    } else if (platform.loaderStr.lowercase() == "legacyfabric") {
         extra.set("loom.platform", "fabric")
-        apply(plugin = "gg.essential.loom")
+        apply<LoomGradlePlugin>()
         extra.set("loom.platform", platform.loaderStr)
     } else {
-        apply(plugin = "gg.essential.loom")
+        apply<LoomGradlePlugin>()
     }
 
     extensions.configure<LoomGradleExtensionAPI> {
