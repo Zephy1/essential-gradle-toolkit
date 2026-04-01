@@ -28,7 +28,9 @@ dependencies {
 
     compileOnly(libs.kotlin.gradlePlugin)
     implementation(libs.kotlinx.binaryCompatibilityValidator)
-    api(libs.preprocessor)
+    api(libs.preprocessor) {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-compiler-embeddable")
+    }
     implementation(libs.asm)
     implementation(libs.guava)
     implementation(libs.kotlinx.metadata.jvm)

@@ -24,35 +24,35 @@
 
 package gg.essential.gradle.util.relocate
 
-import kotlinx.metadata.ClassName
-import kotlinx.metadata.ExperimentalContextReceivers
-import kotlinx.metadata.KmAnnotation
-import kotlinx.metadata.KmClass
-import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.KmConstructor
-import kotlinx.metadata.KmFlexibleTypeUpperBound
-import kotlinx.metadata.KmFunction
-import kotlinx.metadata.KmLambda
-import kotlinx.metadata.KmPackage
-import kotlinx.metadata.KmProperty
-import kotlinx.metadata.KmType
-import kotlinx.metadata.KmTypeAlias
-import kotlinx.metadata.KmTypeParameter
-import kotlinx.metadata.KmTypeProjection
-import kotlinx.metadata.KmValueParameter
-import kotlinx.metadata.isLocalClassName
-import kotlinx.metadata.jvm.JvmFieldSignature
-import kotlinx.metadata.jvm.JvmMethodSignature
-import kotlinx.metadata.jvm.annotations
-import kotlinx.metadata.jvm.fieldSignature
-import kotlinx.metadata.jvm.getterSignature
-import kotlinx.metadata.jvm.localDelegatedProperties
-import kotlinx.metadata.jvm.setterSignature
-import kotlinx.metadata.jvm.signature
-import kotlinx.metadata.jvm.syntheticMethodForAnnotations
-import kotlinx.metadata.jvm.syntheticMethodForDelegate
-import kotlinx.metadata.jvm.toJvmInternalName
 import org.objectweb.asm.commons.Remapper
+import kotlin.metadata.ClassName
+import kotlin.metadata.KmAnnotation
+import kotlin.metadata.KmClass
+import kotlin.metadata.KmClassifier
+import kotlin.metadata.KmConstructor
+import kotlin.metadata.KmFlexibleTypeUpperBound
+import kotlin.metadata.KmFunction
+import kotlin.metadata.KmLambda
+import kotlin.metadata.KmPackage
+import kotlin.metadata.KmProperty
+import kotlin.metadata.KmType
+import kotlin.metadata.KmTypeAlias
+import kotlin.metadata.KmTypeParameter
+import kotlin.metadata.KmTypeProjection
+import kotlin.metadata.KmValueParameter
+import kotlin.metadata.isLocalClassName
+import kotlin.metadata.jvm.JvmFieldSignature
+import kotlin.metadata.jvm.JvmMethodSignature
+import kotlin.metadata.jvm.annotations
+import kotlin.metadata.jvm.fieldSignature
+import kotlin.metadata.jvm.getterSignature
+import kotlin.metadata.jvm.localDelegatedProperties
+import kotlin.metadata.jvm.setterSignature
+import kotlin.metadata.jvm.signature
+import kotlin.metadata.jvm.syntheticMethodForAnnotations
+import kotlin.metadata.jvm.syntheticMethodForDelegate
+import kotlin.metadata.jvm.toJvmInternalName
+import kotlin.metadata.ExperimentalContextReceivers
 
 @OptIn(ExperimentalContextReceivers::class)
 class KotlinClassRemapper(private val remapper: Remapper) {
@@ -66,7 +66,7 @@ class KotlinClassRemapper(private val remapper: Remapper) {
         clazz.constructors.replaceAll(this::remap)
         clazz.nestedClasses.replaceAll(this::remap)
         clazz.sealedSubclasses.replaceAll(this::remap)
-        clazz.contextReceiverTypes.replaceAll(this::remap)
+//        clazz.contextReceiverTypes.replaceAll(this::remap)
         clazz.localDelegatedProperties.replaceAll(this::remap)
         return clazz
     }
@@ -113,7 +113,7 @@ class KotlinClassRemapper(private val remapper: Remapper) {
     private fun remap(function: KmFunction): KmFunction {
         function.typeParameters.replaceAll(this::remap)
         function.receiverParameterType = function.receiverParameterType?.let { remap(it) }
-        function.contextReceiverTypes.replaceAll(this::remap)
+//        function.contextReceiverTypes.replaceAll(this::remap)
         function.valueParameters.replaceAll(this::remap)
         function.returnType = remap(function.returnType)
         function.signature = function.signature?.let { remap(it) }
@@ -123,7 +123,7 @@ class KotlinClassRemapper(private val remapper: Remapper) {
     private fun remap(property: KmProperty): KmProperty {
         property.typeParameters.replaceAll(this::remap)
         property.receiverParameterType = property.receiverParameterType?.let { remap(it) }
-        property.contextReceiverTypes.replaceAll(this::remap)
+//        property.contextReceiverTypes.replaceAll(this::remap)
         property.setterParameter = property.setterParameter?.let { remap(it) }
         property.returnType = remap(property.returnType)
         property.fieldSignature = property.fieldSignature?.let { remap(it) }

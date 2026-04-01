@@ -9,6 +9,15 @@ plugins {
 
 val platform = Platform.of(project)
 
+if (platform.isUnobfuscated) {
+    // Unobfuscated versions of Loom no longer need to remap mod dependencies, and so no longer provide the `mod*`
+    // configurations. We'll re-create them so they can be used across all versions.
+    configurations.api.get().extendsFrom(configurations.create("modApi"))
+    configurations.implementation.get().extendsFrom(configurations.create("modImplementation"))
+    configurations.compileOnly.get().extendsFrom(configurations.create("modCompileOnly"))
+    configurations.runtimeOnly.get().extendsFrom(configurations.create("modRuntimeOnly"))
+}
+
 data class Revision(
     val yarn: Map<Int, String>,
     val mcp: Map<Int, String>,
@@ -106,7 +115,7 @@ revisions.add(Revision(
         10800 to "stable:18-1.8",
         10710 to "stable:12-1.7.10",
     ),
-    fabricLoader = "0.18.4",
+    fabricLoader = "0.18.5",
     legacyFabricLoader = "1.13.2",
     forge = mapOf(
         12108 to "1.21.8-58.0.0",
@@ -181,8 +190,8 @@ fun prop(property: String, default: String?) =
 
 dependencies {
     minecraft(prop("minecraft", "com.mojang:minecraft:${platform.mcVersionStr}"))
-
     val mappingsStr = prop("mappings", when {
+        platform.isUnobfuscated -> ""
         platform.isFabric ->
             revision.yarn[platform.mcVersion]?.let { "net.fabricmc:yarn:$it" }
 		platform.isLegacyFabric ->
@@ -199,11 +208,10 @@ dependencies {
 
     if (platform.isFabric) {
 		modImplementation(prop("fabric-loader", "net.fabricmc:fabric-loader:${revision.fabricLoader}"))
-	}else if (platform.isLegacyFabric) {
+	} else if (platform.isLegacyFabric) {
         modImplementation(prop("fabric-loader", "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${revision.legacyFabricLoader}+${platform.mcVersionStr}"))
     } else if (platform.isForge) {
         "forge"(prop("forge", revision.forge[platform.mcVersion]?.let { "net.minecraftforge:forge:$it" }))
-
         loom.forge.pack200Provider.set(Pack200Adapter())
     } else if (platform.isNeoForge) {
         "neoForge"(prop("neoForge", revision.neoForge[platform.mcVersion]?.let { "net.neoforged:neoforge:$it" }))

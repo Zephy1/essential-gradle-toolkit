@@ -3,6 +3,8 @@ package gg.essential
 import com.replaymod.gradle.preprocess.PreprocessExtension
 import com.replaymod.gradle.preprocess.PreprocessPlugin
 import gg.essential.gradle.multiversion.Platform
+import net.fabricmc.loom.LoomGradlePlugin
+import net.fabricmc.loom.LoomNoRemapGradlePlugin
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.task.RunGameTask
 import org.gradle.api.Project
@@ -11,7 +13,6 @@ import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
@@ -29,6 +30,13 @@ parent?.let(::inheritConfigurationFrom)
 
 fun setupLoomPlugin() {
     extra.set("loom.platform", platform.loaderStr)
+
+    if (platform.isUnobfuscated) {
+        extra.set("fabric.loom.disableObfuscation", "true")
+        apply<LoomNoRemapGradlePlugin>()
+    } else {
+        apply<LoomGradlePlugin>()
+    }
 
     if (platform.loaderStr.lowercase() == "legacyfabric") {
         extra.set("loom.platform", "fabric")
@@ -81,9 +89,7 @@ fun configureJavaVersion() {
             jvmToolchain {
                 languageVersion.set(JavaLanguageVersion.of(platform.javaVersion.majorVersion))
             }
-        }
 
-        tasks.withType<KotlinCompile>().configureEach {
             compilerOptions {
                 jvmTarget.set(
                     when (platform.javaVersion) {
@@ -91,6 +97,7 @@ fun configureJavaVersion() {
                         JavaVersion.VERSION_11 -> JvmTarget.JVM_11
                         JavaVersion.VERSION_17 -> JvmTarget.JVM_17
                         JavaVersion.VERSION_21 -> JvmTarget.JVM_21
+                        JavaVersion.VERSION_25 -> JvmTarget.JVM_25
                         else -> JvmTarget.fromTarget(platform.javaVersion.toString())
                     }
                 )
@@ -142,9 +149,9 @@ fun inheritConfigurationFrom(parent: Project) {
 
     afterEvaluate {
         pluginManager.withPlugin("kotlin") {
-            tasks.withType<KotlinCompile>().configureEach {
+            configure<KotlinJvmProjectExtension> {
                 compilerOptions {
-                    if (moduleName.orNull == null && !freeCompilerArgs.get().contains("-module-name")) {
+                    if (!moduleName.isPresent && "-module-name" !in freeCompilerArgs.get()) {
                         moduleName.set(
                             project.findProperty("baseArtifactId")?.toString()
                                 ?: parentBase?.archivesName?.orNull

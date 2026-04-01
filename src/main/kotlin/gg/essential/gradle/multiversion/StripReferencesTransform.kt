@@ -1,11 +1,6 @@
 package gg.essential.gradle.multiversion
 
 import gg.essential.gradle.util.compatibleKotlinMetadataVersion
-import kotlinx.metadata.KmClassifier
-import kotlinx.metadata.KmType
-import kotlinx.metadata.KmValueParameter
-import kotlinx.metadata.jvm.JvmMetadataVersion
-import kotlinx.metadata.jvm.KotlinClassMetadata
 import org.gradle.api.Project
 import org.gradle.api.artifacts.transform.InputArtifact
 import org.gradle.api.artifacts.transform.TransformAction
@@ -16,6 +11,9 @@ import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.work.DisableCachingByDefault
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
@@ -30,6 +28,10 @@ import java.io.File
 import java.util.jar.JarInputStream
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
+import kotlin.metadata.KmClassifier
+import kotlin.metadata.KmType
+import kotlin.metadata.KmValueParameter
+import kotlin.metadata.jvm.KotlinClassMetadata
 
 /**
  * Strips all references to classes in the given package(s) from the artifact to which it is applied.
@@ -48,6 +50,7 @@ import java.util.zip.ZipEntry
  *
  * To simplify setup, use [registerStripReferencesAttribute].
  */
+@DisableCachingByDefault
 abstract class StripReferencesTransform : TransformAction<StripReferencesTransform.Parameters> {
     interface Parameters : TransformParameters {
         @get:Input
@@ -55,6 +58,7 @@ abstract class StripReferencesTransform : TransformAction<StripReferencesTransfo
     }
 
     @get:InputArtifact
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
     abstract val input: Provider<FileSystemLocation>
 
     override fun transform(outputs: TransformOutputs) {

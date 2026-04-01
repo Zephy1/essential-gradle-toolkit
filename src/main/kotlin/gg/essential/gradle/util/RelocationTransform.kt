@@ -2,6 +2,7 @@ package gg.essential.gradle.util
 
 import gg.essential.gradle.util.relocate.KotlinMetadataRemappingClassVisitor
 import org.gradle.api.Project
+import org.gradle.api.artifacts.transform.CacheableTransform
 import org.gradle.api.artifacts.transform.InputArtifact
 import org.gradle.api.artifacts.transform.TransformAction
 import org.gradle.api.artifacts.transform.TransformOutputs
@@ -11,8 +12,11 @@ import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.commons.ClassRemapper
 import org.objectweb.asm.commons.Remapper
 import java.io.Closeable
@@ -35,6 +39,7 @@ import java.util.zip.ZipEntry
  *
  * To simplify setup, use [registerRelocationAttribute].
  */
+@CacheableTransform
 abstract class RelocationTransform : TransformAction<RelocationTransform.Parameters> {
     interface Parameters : TransformParameters {
         @get:Input
@@ -60,6 +65,7 @@ abstract class RelocationTransform : TransformAction<RelocationTransform.Paramet
     data class Rename(val sourceFile: String, val targetFile: String) : Serializable
 
     @get:InputArtifact
+    @get:PathSensitive(PathSensitivity.NAME_ONLY)
     abstract val input: Provider<FileSystemLocation>
 
     override fun transform(outputs: TransformOutputs) {
@@ -79,7 +85,7 @@ abstract class RelocationTransform : TransformAction<RelocationTransform.Paramet
             it.replace('.', '/') + ".class"
         }
 
-        open class ClassPrefixRemapper : Remapper() {
+        open class ClassPrefixRemapper : Remapper(Opcodes.ASM9) {
             override fun map(typeName: String): String = map(jvmPackageMap, typeName)
 
             protected fun map(mappings: Map<String, String>, typeName: String): String {
