@@ -228,14 +228,7 @@ if (platform.isModLauncher) {
     }
 }
 
-if (platform.isNeoForge) {
-    repositories {
-        maven("https://maven.neoforged.net/releases/")
-    }
-}
-
-if (platform.isLegacyFabric) {
-    repositories {
-        maven("https://repo.legacyfabric.net/repository/legacyfabric/")
-    }
+repositories {
+    maven("https://maven.neoforged.net/releases/")
+    maven("https://repo.legacyfabric.net/repository/legacyfabric/")
 }
