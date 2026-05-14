@@ -44,12 +44,14 @@ data class Revision(
 }
 val revisions = mutableListOf<Revision>()
 
+val fabricLoader = "0.19.2"
 // Add new versions to the first revision, so they're available to all users.
 // To change existing entries, create a new revision extending from the last one, so existing users keep seeing the old
 // one until they opt-in to the new one.
 revisions.add(Revision(
+    fabricLoader = fabricLoader,
     yarn = mapOf(
-        12111 to "1.21.11+build.4:v2",
+        12111 to "1.21.11+build.5:v2",
         12110 to "1.21.10+build.3:v2",
         12109 to "1.21.9+build.1:v2",
         12108 to "1.21.8+build.1:v2",
@@ -115,7 +117,6 @@ revisions.add(Revision(
         10800 to "stable:18-1.8",
         10710 to "stable:12-1.7.10",
     ),
-    fabricLoader = "0.18.5",
     legacyFabricLoader = "1.13.2",
     forge = mapOf(
         12108 to "1.21.8-58.0.0",
