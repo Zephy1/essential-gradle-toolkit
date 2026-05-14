@@ -21,7 +21,6 @@ data class Platform(
     val isForgeLike = isForge || isNeoForge
     val isModLauncher = isForgeLike && mcVersion >= 11400
     val isLegacyForge = loader == Loader.Forge && mcVersion < 11400
-
     val isUnobfuscated = mcVersion >= 26_00_00
 
     val javaVersion = when {
@@ -44,7 +43,6 @@ data class Platform(
     }
 
     companion object {
-
         fun of(project: Project): Platform {
             val loader = guessLoader(project)
             val mcVersionStr = guessMcVersion(project)
@@ -92,7 +90,7 @@ data class Platform(
             throw GradleException("Failed to infer mod loader for project \"${project.path}\".\n" +
                     "Either set \"loom.platform\" in its \"gradle.properties\"," +
                     "or change the project name to include the platform.\n" +
-                    "Valid values: ${Loader.values().joinToString { it.name.lowercase() }}")
+                    "Valid values: ${Loader.entries.joinToString { it.name.lowercase() }}")
         }
     }
 }

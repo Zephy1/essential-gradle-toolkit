@@ -16,28 +16,29 @@ if (platform.isUnobfuscated) {
     configurations.implementation.get().extendsFrom(configurations.create("modImplementation"))
     configurations.compileOnly.get().extendsFrom(configurations.create("modCompileOnly"))
     configurations.runtimeOnly.get().extendsFrom(configurations.create("modRuntimeOnly"))
+    configurations.localRuntime.get().extendsFrom(configurations.create("modLocalRuntime"))
 }
 
 data class Revision(
-    val yarn: Map<Int, String>,
-    val mcp: Map<Int, String>,
     val fabricLoader: String,
     val legacyFabricLoader: String,
+    val yarn: Map<Int, String>,
+    val mcp: Map<Int, String>,
     val forge: Map<Int, String>,
     val neoForge: Map<Int, String>,
 ) {
     fun update(
-        yarn: Map<Int, String> = emptyMap(),
-        mcp: Map<Int, String> = emptyMap(),
         fabricLoader: String = this.fabricLoader,
         legacyFabricLoader: String = this.legacyFabricLoader,
+        yarn: Map<Int, String> = emptyMap(),
+        mcp: Map<Int, String> = emptyMap(),
         forge: Map<Int, String> = emptyMap(),
         neoForge: Map<Int, String> = emptyMap(),
     ) = Revision(
-        this.yarn + yarn,
-        this.mcp + mcp,
         fabricLoader,
         legacyFabricLoader,
+        this.yarn + yarn,
+        this.mcp + mcp,
         this.forge + forge,
         this.neoForge + neoForge,
     )
@@ -45,11 +46,21 @@ data class Revision(
 val revisions = mutableListOf<Revision>()
 
 val fabricLoader = "0.19.2"
+val fabricLanguageKotlin = "1.13.11+kotlin.2.3.21"
+val fabricApiVersions = mapOf(
+    260102 to "0.148.2+26.1.2",
+    260101 to "0.145.4+26.1.1",
+    260100 to "0.145.1+26.1",
+    12111 to "0.141.4+1.21.11",
+    12110 to "0.138.4+1.21.10",
+)
+
 // Add new versions to the first revision, so they're available to all users.
 // To change existing entries, create a new revision extending from the last one, so existing users keep seeing the old
 // one until they opt-in to the new one.
 revisions.add(Revision(
     fabricLoader = fabricLoader,
+    legacyFabricLoader = "1.13.2",
     yarn = mapOf(
         12111 to "1.21.11+build.5:v2",
         12110 to "1.21.10+build.3:v2",
@@ -117,7 +128,6 @@ revisions.add(Revision(
         10800 to "stable:18-1.8",
         10710 to "stable:12-1.7.10",
     ),
-    legacyFabricLoader = "1.13.2",
     forge = mapOf(
         12108 to "1.21.8-58.0.0",
         12107 to "1.21.7-57.0.2",
@@ -171,7 +181,7 @@ revisions.add(Revision(
         12004 to "20.4.234",
         12003 to "20.3.8-beta",
         12002 to "20.2.88",
-    )
+    ),
 ))
 
 val revisionId = findProperty("essential.defaults.loom")?.toString() ?: throw GradleException("""
@@ -209,6 +219,8 @@ dependencies {
 
     if (platform.isFabric) {
 		modImplementation(prop("fabric-loader", "net.fabricmc:fabric-loader:${revision.fabricLoader}"))
+        val fabricApiVersion = fabricApiVersions[platform.mcVersion] ?: throw GradleException("No fabric-api version for ${platform.mcVersionStr}")
+        modImplementation(prop("fabric-api", "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"))
 	} else if (platform.isLegacyFabric) {
         modImplementation(prop("fabric-loader", "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${revision.legacyFabricLoader}+${platform.mcVersionStr}"))
     } else if (platform.isForge) {
