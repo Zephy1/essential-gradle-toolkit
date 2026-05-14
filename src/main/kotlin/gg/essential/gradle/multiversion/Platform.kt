@@ -1,17 +1,17 @@
 package gg.essential.gradle.multiversion
 
+import gg.essential.Versions
 import org.gradle.api.GradleException
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
 data class Platform(
-    val mcMajor: Int,
-    val mcMinor: Int,
-    val mcPatch: Int,
+    val mcVersion: Int,
+    val mcVersionStr: String,
     val loader: Loader,
+    val fabricApiVersion: String?,
+    val fabricKotlinVersion: String?,
 ) {
-    val mcVersion = mcMajor * 10000 + mcMinor * 100 + mcPatch
-    val mcVersionStr = listOf(mcMajor, mcMinor, mcPatch).dropLastWhile { it == 0 }.joinToString(".")
     val loaderStr = loader.toString().lowercase()
 
     val isFabric = loader == Loader.Fabric
@@ -47,7 +47,10 @@ data class Platform(
             val loader = guessLoader(project)
             val mcVersionStr = guessMcVersion(project)
             val (major, minor, patch) = mcVersionStr.split('.').map { it.toInt() } + listOf(0)
-            return Platform(major, minor, patch, loader)
+            val mcVersion = major * 10000 + minor * 100 + patch
+            val fabricApiVersionStr = guessFabricApiVersion(project, loader, mcVersion)
+            val fabricKotlinVersionStr = guessFabricKotlinVersion(project, loader)
+            return Platform(mcVersion, mcVersionStr, loader, fabricApiVersionStr, fabricKotlinVersionStr)
         }
 
         private fun guessMcVersion(project: Project): String {
@@ -91,6 +94,28 @@ data class Platform(
                     "Either set \"loom.platform\" in its \"gradle.properties\"," +
                     "or change the project name to include the platform.\n" +
                     "Valid values: ${Loader.entries.joinToString { it.name.lowercase() }}")
+        }
+
+        private fun guessFabricApiVersion(project: Project, loader: Loader, mcVersion: Int): String? {
+            if (loader != Loader.Fabric) return null
+            project.findProperty("essential.defaults.loom.fabric-api")?.toString()?.let {
+                if (it == "true") {
+                    return Versions.FABRIC_API_VERSIONS[mcVersion]
+                }
+                return it
+            }
+            return null
+        }
+
+        private fun guessFabricKotlinVersion(project: Project, loader: Loader): String? {
+            if (loader != Loader.Fabric) return null
+            project.findProperty("essential.defaults.loom.fabric-kotlin")?.toString()?.let {
+                if (it == "true") {
+                    return Versions.FABRIC_LANGUAGE_KOTLIN_VERSION
+                }
+                return it
+            }
+            return null
         }
     }
 }

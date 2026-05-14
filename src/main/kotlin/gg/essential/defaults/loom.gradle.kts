@@ -1,6 +1,7 @@
 package gg.essential.defaults
 
 import dev.architectury.pack200.java.Pack200Adapter
+import gg.essential.Versions
 import gg.essential.gradle.multiversion.Platform
 
 plugins {
@@ -45,21 +46,11 @@ data class Revision(
 }
 val revisions = mutableListOf<Revision>()
 
-val fabricLoader = "0.19.2"
-val fabricLanguageKotlin = "1.13.11+kotlin.2.3.21"
-val fabricApiVersions = mapOf(
-    260102 to "0.148.2+26.1.2",
-    260101 to "0.145.4+26.1.1",
-    260100 to "0.145.1+26.1",
-    12111 to "0.141.4+1.21.11",
-    12110 to "0.138.4+1.21.10",
-)
-
 // Add new versions to the first revision, so they're available to all users.
 // To change existing entries, create a new revision extending from the last one, so existing users keep seeing the old
 // one until they opt-in to the new one.
 revisions.add(Revision(
-    fabricLoader = fabricLoader,
+    fabricLoader = Versions.FABRIC_LOADER_VERSION,
     legacyFabricLoader = "1.13.2",
     yarn = mapOf(
         12111 to "1.21.11+build.5:v2",
@@ -219,8 +210,12 @@ dependencies {
 
     if (platform.isFabric) {
 		modImplementation(prop("fabric-loader", "net.fabricmc:fabric-loader:${revision.fabricLoader}"))
-        val fabricApiVersion = fabricApiVersions[platform.mcVersion] ?: throw GradleException("No fabric-api version for ${platform.mcVersionStr}")
-        modImplementation(prop("fabric-api", "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"))
+        platform.fabricApiVersion?.let {
+            modImplementation("net.fabricmc.fabric-api:fabric-api:${it}")
+        }
+        platform.fabricKotlinVersion?.let {
+            modImplementation("net.fabricmc:fabric-language-kotlin:${it}")
+        }
 	} else if (platform.isLegacyFabric) {
         modImplementation(prop("fabric-loader", "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${revision.legacyFabricLoader}+${platform.mcVersionStr}"))
     } else if (platform.isForge) {
