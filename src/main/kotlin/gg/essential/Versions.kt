@@ -5,7 +5,7 @@ object Versions {
     const val FABRIC_LANGUAGE_KOTLIN_VERSION = "1.13.11+kotlin.2.3.21"
 
     val FABRIC_API_VERSIONS = mapOf(
-        260102 to "0.148.2+26.1.2",
+        260102 to "0.149.0+26.1.2",
         260101 to "0.145.4+26.1.1",
         260100 to "0.145.1+26.1",
         12111  to "0.141.4+1.21.11",
