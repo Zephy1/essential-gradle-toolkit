@@ -9,6 +9,7 @@ data class Platform(
     val mcVersion: Int,
     val mcVersionStr: String,
     val loader: Loader,
+    val yarnVersion: String?,
     val fabricApiVersion: String?,
     val fabricKotlinVersion: String?,
 ) {
@@ -48,9 +49,10 @@ data class Platform(
             val mcVersionStr = guessMcVersion(project)
             val (major, minor, patch) = mcVersionStr.split('.').map { it.toInt() } + listOf(0)
             val mcVersion = major * 10000 + minor * 100 + patch
+            val yarnVersionStr = guessYarnVersion(project, loader, mcVersion)
             val fabricApiVersionStr = guessFabricApiVersion(project, loader, mcVersion)
             val fabricKotlinVersionStr = guessFabricKotlinVersion(project, loader)
-            return Platform(mcVersion, mcVersionStr, loader, fabricApiVersionStr, fabricKotlinVersionStr)
+            return Platform(mcVersion, mcVersionStr, loader, yarnVersionStr, fabricApiVersionStr, fabricKotlinVersionStr)
         }
 
         private fun guessMcVersion(project: Project): String {
@@ -94,6 +96,17 @@ data class Platform(
                     "Either set \"loom.platform\" in its \"gradle.properties\"," +
                     "or change the project name to include the platform.\n" +
                     "Valid values: ${Loader.entries.joinToString { it.name.lowercase() }}")
+        }
+
+        private fun guessYarnVersion(project: Project, loader: Loader, mcVersion: Int): String? {
+            if (loader != Loader.Fabric && loader != Loader.LegacyFabric) return null
+            project.findProperty("essential.defaults.loom.yarn")?.toString()?.let {
+                if (it == "true") {
+                    return Versions.YARN_VERSIONS[mcVersion]
+                }
+                return it
+            }
+            return null
         }
 
         private fun guessFabricApiVersion(project: Project, loader: Loader, mcVersion: Int): String? {
