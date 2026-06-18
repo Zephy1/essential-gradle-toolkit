@@ -9,7 +9,6 @@ plugins {
 }
 
 val platform = Platform.of(project)
-
 if (platform.isUnobfuscated) {
     // Unobfuscated versions of Loom no longer need to remap mod dependencies, and so no longer provide the `mod*`
     // configurations. We'll re-create them so they can be used across all versions.
@@ -19,171 +18,6 @@ if (platform.isUnobfuscated) {
     configurations.runtimeOnly.get().extendsFrom(configurations.create("modRuntimeOnly"))
     configurations.localRuntime.get().extendsFrom(configurations.create("modLocalRuntime"))
 }
-
-data class Revision(
-    val fabricLoader: String,
-    val legacyFabricLoader: String,
-    val yarn: Map<Int, String>,
-    val mcp: Map<Int, String>,
-    val forge: Map<Int, String>,
-    val neoForge: Map<Int, String>,
-) {
-    fun update(
-        fabricLoader: String = this.fabricLoader,
-        legacyFabricLoader: String = this.legacyFabricLoader,
-        yarn: Map<Int, String> = emptyMap(),
-        mcp: Map<Int, String> = emptyMap(),
-        forge: Map<Int, String> = emptyMap(),
-        neoForge: Map<Int, String> = emptyMap(),
-    ) = Revision(
-        fabricLoader,
-        legacyFabricLoader,
-        this.yarn + yarn,
-        this.mcp + mcp,
-        this.forge + forge,
-        this.neoForge + neoForge,
-    )
-}
-val revisions = mutableListOf<Revision>()
-
-// Add new versions to the first revision, so they're available to all users.
-// To change existing entries, create a new revision extending from the last one, so existing users keep seeing the old
-// one until they opt-in to the new one.
-revisions.add(Revision(
-    fabricLoader = Versions.FABRIC_LOADER_VERSION,
-    legacyFabricLoader = "1.13.2",
-    yarn = mapOf(
-        12111 to "1.21.11+build.5:v2",
-        12110 to "1.21.10+build.3:v2",
-        12109 to "1.21.9+build.1:v2",
-        12108 to "1.21.8+build.1:v2",
-        12107 to "1.21.7+build.8:v2",
-        12106 to "1.21.6+build.1:v2",
-        12105 to "1.21.5+build.1:v2",
-        12104 to "1.21.4+build.8:v2",
-        12103 to "1.21.3+build.2:v2",
-        12102 to "1.21.2+build.1:v2",
-        12101 to "1.21.1+build.3:v2",
-        12100 to "1.21+build.9:v2",
-        12006 to "1.20.6+build.3:v2",
-        12005 to "1.20.5+build.1:v2",
-        12004 to "1.20.4+build.3:v2",
-        12003 to "1.20.3+build.1:v2",
-        12002 to "1.20.2+build.4:v2",
-        12001 to "1.20.1+build.10:v2",
-        12000 to "1.20+build.1:v2",
-        11904 to "1.19.4+build.2:v2",
-        11903 to "1.19.3+build.5:v2",
-        11902 to "1.19.2+build.28:v2",
-        11901 to "1.19.1+build.6:v2",
-        11900 to "1.19+build.4:v2",
-        11802 to "1.18.2+build.4:v2",
-        11801 to "1.18.1+build.22:v2",
-        11801 to "1.18+build.1:v2",
-        11701 to "1.17.1+build.65:v2",
-        11700 to "1.17+build.13:v2",
-        11605 to "1.16.5+build.10:v2",
-        11604 to "1.16.4+build.9:v2",
-        11603 to "1.16.3+build.47:v2",
-        11602 to "1.16.2+build.47:v2",
-        11601 to "1.16.1+build.21:v2",
-        11502 to "1.15.2+build.17",
-        11404 to "1.14.4+build.18",
-        11403 to "1.14.3+build.13",
-        11402 to "1.14.2+build.7",
-        11401 to "1.14.1+build.10",
-        11400 to "1.14+build.21",
-
-        // Legacy Fabric
-        11302 to "1.13.2+build.575:v2",
-        11202 to "1.12.2+build.575:v2",
-        11102 to "1.11.2+build.575:v2",
-        11002 to "1.10.2+build.575:v2",
-        10904 to "1.9.4+build.575:v2",
-        10809 to "1.8.9+build.575:v2",
-    ),
-    mcp = mapOf(
-        11605 to "snapshot:20210309-1.16.5",
-        11602 to "snapshot:20201028-1.16.3",
-        11601 to "snapshot:20201028-1.16.3",
-        11502 to "stable:60-1.15",
-        11404 to "stable:58-1.14.4",
-        11202 to "stable:39-1.12",
-        11201 to "stable:39-1.12",
-        11200 to "stable:39-1.12",
-        11102 to "stable:32-1.11",
-        11100 to "stable:32-1.11",
-        11002 to "stable:29-1.10.2",
-        10904 to "snapshot:20160518-1.9.4",
-        10809 to "stable:22-1.8.9",
-        10800 to "stable:18-1.8",
-        10710 to "stable:12-1.7.10",
-    ),
-    forge = mapOf(
-        12108 to "1.21.8-58.0.0",
-        12107 to "1.21.7-57.0.2",
-        12106 to "1.21.6-56.0.9",
-        12105 to "1.21.5-55.0.3",
-        12104 to "1.21.4-54.0.26",
-        12103 to "1.21.3-53.0.44",
-        12101 to "1.21.1-52.0.47",
-        12100 to "1.21-51.0.33",
-        12006 to "1.20.6-50.1.39",
-        12004 to "1.20.4-49.0.48",
-        12003 to "1.20.3-49.0.2",
-        12002 to "1.20.2-48.1.0",
-        12001 to "1.20.1-47.0.3",
-        12000 to "1.20-46.0.14",
-        11904 to "1.19.4-45.1.0",
-        11903 to "1.19.3-44.1.0",
-        11902 to "1.19.2-43.2.0",
-        11900 to "1.19-41.1.0",
-        11802 to "1.18.2-40.0.46",
-        11801 to "1.18.1-39.1.0",
-        11701 to "1.17.1-37.1.1",
-        11605 to "1.16.5-36.2.39",
-        11602 to "1.16.2-33.0.61",
-        11601 to "1.16.1-32.0.108",
-        11502 to "1.15.2-31.2.57",
-        11404 to "1.14.4-28.2.26",
-        11202 to "1.12.2-14.23.5.2847",
-        11201 to "1.12.1-14.22.1.2478",
-        11102 to "1.11.2-13.20.1.2588",
-        11102 to "1.11.2-13.20.1.2588",
-        11100 to "1.11-13.19.1.2189",
-        11002 to "1.10.2-12.18.3.2511",
-        10904 to "1.9.4-12.17.0.2317",
-        10809 to "1.8.9-11.15.1.2318-1.8.9",
-        10800 to "1.8-11.14.4.1563",
-        10710 to "1.7.10-10.13.4.1614-1.7.10",
-    ),
-    neoForge = mapOf(
-        12108 to "21.8.5-beta",
-        12107 to "21.7.11-beta",
-        12106 to "21.6.20-beta",
-        12105 to "21.5.22-beta",
-        12104 to "21.4.79-beta",
-        12103 to "21.3.60",
-        12102 to "21.2.1-beta",
-        12101 to "21.1.115",
-        12100 to "21.0.167",
-        12006 to "20.6.7-beta",
-        12005 to "20.5.21-beta",
-        12004 to "20.4.234",
-        12003 to "20.3.8-beta",
-        12002 to "20.2.88",
-    ),
-))
-
-val revisionId = findProperty("essential.defaults.loom")?.toString() ?: throw GradleException("""
-    No loom defaults version set.
-    You need to set `essential.defaults.loom` in the project's `gradle.properties` file to a specific revision,
-    so your build does not break when the defaults change.
-    The recommended revision is always the most recent one, currently ${revisions.lastIndex}.
-""".trimIndent())
-
-val revision = revisions.getOrNull(revisionId.toIntOrNull() ?: -1)
-    ?: throw GradleException("Invalid revision `$revisionId` for `essential.defaults.loom`. Latest is ${revisions.lastIndex}.")
 
 fun prop(property: String, default: String?) =
     findProperty("essential.defaults.loom.$property")?.toString()
@@ -195,11 +29,11 @@ dependencies {
     val mappingsStr = prop("mappings", when {
         platform.isUnobfuscated -> ""
         platform.isFabric ->
-            revision.yarn[platform.mcVersion]?.let { "net.fabricmc:yarn:$it" }
+            Versions.YARN_VERSIONS[platform.mcVersion]?.let { "net.fabricmc:yarn:$it" }
 		platform.isLegacyFabric ->
-			revision.yarn[platform.mcVersion]?.let { "net.legacyfabric:yarn:$it" }
+            Versions.YARN_VERSIONS[platform.mcVersion]?.let { "net.legacyfabric:yarn:$it" }
         platform.isForge && platform.mcVersion < 11700 ->
-            revision.mcp[platform.mcVersion]?.let { "de.oceanlabs.mcp:mcp_$it" }
+            Versions.MCP_VERSIONS[platform.mcVersion]?.let { "de.oceanlabs.mcp:mcp_$it" }
         else -> "official"
     })
     if (mappingsStr in listOf("official", "mojang", "mojmap")) {
@@ -209,7 +43,7 @@ dependencies {
     }
 
     if (platform.isFabric) {
-		modImplementation(prop("fabric-loader", "net.fabricmc:fabric-loader:${revision.fabricLoader}"))
+		modImplementation(prop("fabric-loader", "net.fabricmc:fabric-loader:${Versions.FABRIC_LOADER_VERSION}"))
         platform.fabricApiVersion?.let {
             modImplementation("net.fabricmc.fabric-api:fabric-api:${it}")
         }
@@ -217,12 +51,12 @@ dependencies {
             modImplementation("net.fabricmc:fabric-language-kotlin:${it}")
         }
 	} else if (platform.isLegacyFabric) {
-        modImplementation(prop("fabric-loader", "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${revision.legacyFabricLoader}+${platform.mcVersionStr}"))
+        modImplementation(prop("fabric-loader", "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${Versions.LEGACY_FABRIC_LOADER_VERSION}+${platform.mcVersionStr}"))
     } else if (platform.isForge) {
-        "forge"(prop("forge", revision.forge[platform.mcVersion]?.let { "net.minecraftforge:forge:$it" }))
+        "forge"(prop("forge", Versions.FORGE_VERSIONS[platform.mcVersion]?.let { "net.minecraftforge:forge:$it" }))
         loom.forge.pack200Provider.set(Pack200Adapter())
     } else if (platform.isNeoForge) {
-        "neoForge"(prop("neoForge", revision.neoForge[platform.mcVersion]?.let { "net.neoforged:neoforge:$it" }))
+        "neoForge"(prop("neoForge", Versions.NEOFORGE_VERSIONS[platform.mcVersion]?.let { "net.neoforged:neoforge:$it" }))
     }
 }
 
